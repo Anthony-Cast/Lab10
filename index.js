@@ -3,6 +3,8 @@ const express = require('express');
 const mysql = require('mysql2');
 const bodyParser=require('body-parser');
 const app = express();
+const multer = require("multer");
+let upload = multer();
 
 let conn = mysql.createConnection({
     host: 'localhost',
@@ -52,11 +54,11 @@ app.post("/empleados/update",bodyParser.urlencoded({extended:true}), function (r
     var id = req.body.Id;
     var address = req.body.Address;
     var email = req.body.Email;
-    if(address == null){
+    if(address === undefined){
         var sql = "update employees set Email=? where EmployeeID=?";
         var params =[email,id];
     }
-    else if(email==null){
+    else if(email === undefined){
         var sql = "update employees set Address=? where EmployeeID=?";
         var params =[address,id];
     }
@@ -114,11 +116,12 @@ app.get("/productos/get",function (req,res){
 });
 
 //Pregunta 6
-app.post("/categorias/create",bodyParser.urlencoded({extended:true}),function (req,res) {
+app.post("/categorias/create",upload.none(),function (req,res) {
     var name = req.body.name;
     var description = req.body.description;
     var picture = req.body.picture;
-    if(name == null||description == null||picture == null){
+
+    if(name === undefined ||description === undefined||picture === undefined){
         res.json({
             "status":"error",
             "message":"Missing parameters"
@@ -129,8 +132,7 @@ app.post("/categorias/create",bodyParser.urlencoded({extended:true}),function (r
             "status":"error",
             "message":"Picture doesn't have correct extension"
         });
-    }
-    else {
+    }else {
         var sql = "INSERT INTO `lab10_employees`.`categories` (`CategoryName`, `Description`, `Picture`) VALUES (?, ?, ?)";
         var params = [name, description, picture];
         conn.query(sql, params, function (err, results) {
