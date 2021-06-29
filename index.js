@@ -1,4 +1,4 @@
-console.log("Hola");
+
 const express = require('express');
 const mysql = require('mysql2');
 
@@ -31,4 +31,8 @@ app.get("/empleados/getManagerEmployees/:id",function (req, res){
         if (err) throw err;
         res.json(results);
     });
+});
+
+app.listen(3000,function (){
+   console.log("Servidor levantado");
 });
