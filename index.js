@@ -24,13 +24,23 @@ app.get("/empleados/get",function (req, res){
 });
 
 app.get("/empleados/getManagerEmployees/:id",function (req, res){
-    let ReportsTo = req.param.id
-    let sql = "SELECT EmployeeID, LastName, FirstName, Title FROM lab10_employees.employees where ReportsTo = ?"
+    let ReportsTo = req.params.id;
+    let sql = "SELECT EmployeeID, LastName, FirstName, Title FROM lab10_employees.employees where ReportsTo = ?";
     let params = [ReportsTo];
     conn.query(sql, params, function (err,results){
         if (err) throw err;
         res.json(results);
     });
+});
+
+app.get("/empleados/getByTitle/:title",function (req, res) {
+    let Title = req.params.title;
+    let sql="SELECT EmployeeID, LastName, FirstName, Title FROM lab10_employees.employees where Title =?";
+    let params=[Title];
+    conn.query(sql,params,function (err,results){
+        if(err) throw err;
+        res.json(results);
+    })
 });
 
 app.listen(3000,function (){
