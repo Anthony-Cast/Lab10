@@ -81,6 +81,36 @@ app.post("/empleados/update",bodyParser.urlencoded({extended:true}), function (r
     });
 });
 
+//Pregunta 5
+app.get("/productos/get",function (req,res){
+    var page = parseInt(req.query.page);
+    if(Number.isNaN(page)){
+        res.json({
+            "status":"error",
+            "message":"Numero de página no existe"
+        });
+    }
+    var resultPerPage=10;
+    var sql="select ProductID,ProductName,UnitPrice,UnitsInStock from lab10_employees.products";
+    conn.query(sql,function (err,results) {
+        var pages=Math.ceil(results.length/10);
+        if(page<=0||page>pages){
+            res.json({
+                "status":"error",
+                "message":"Numero de página no existe"
+            });
+        }
+        if(err){
+            res.json({
+                "status":"ok",
+                "message":err.sqlMessage
+            });
+        }
+        var resultCort=results.slice((page-1)*resultPerPage,page*resultPerPage);
+        res.json(resultCort);
+    });
+});
+
 //Puerto
 app.listen(3000,function (){
    console.log("Servidor levantado");
