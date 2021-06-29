@@ -1,7 +1,7 @@
 
 const express = require('express');
 const mysql = require('mysql2');
-
+const bodyParser=require('body-parser');
 const app = express();
 
 let conn = mysql.createConnection({
@@ -31,6 +31,39 @@ app.get("/empleados/getManagerEmployees/:id",function (req, res){
         if (err) throw err;
         res.json(results);
     });
+});
+
+app.post("/empleados/update",bodyParser.urlencoded({extended:true}), function (req,res){
+    var id = req.body.Id;
+    var address = req.body.Address;
+    var email = req.body.Email;
+    if(address == null){
+        var sql = "update employees set Email=? where EmployeeID=?";
+        var params =[email,id];
+    }
+    else if(email==null){
+        var sql = "update employees set Address=? where EmployeeID=?";
+        var params =[address,id];
+    }
+    else{
+        var sql = "update employees set Email=?,Address=? where EmployeeID=?";
+        var params =[email,address,id];
+    }
+    conn.query(sql,params,function (err,results)
+        {
+            if (err){
+                res.json({
+                   "status":"error",
+                   "message":err.sqlMessage
+                });
+            }
+            else{
+                res.json({
+                    "status":"ok",
+                    "message":"Employee updated"
+                });
+            }
+        });
 });
 
 app.get("/empleados/getByTitle/:title",function (req, res) {
