@@ -90,25 +90,62 @@ app.get("/productos/get",function (req,res){
             "message":"Numero de página no existe"
         });
     }
-    var resultPerPage=10;
-    var sql="select ProductID,ProductName,UnitPrice,UnitsInStock from lab10_employees.products";
-    conn.query(sql,function (err,results) {
-        var pages=Math.ceil(results.length/10);
-        if(page<=0||page>pages){
+    else {
+        var resultPerPage = 10;
+        var sql = "select ProductID,ProductName,UnitPrice,UnitsInStock from lab10_employees.products";
+        conn.query(sql, function (err, results) {
+            var pages = Math.ceil(results.length / 10);
+            if (page <= 0 || page > pages) {
+                res.json({
+                    "status": "error",
+                    "message": "Numero de página no existe"
+                });
+            }
+            if (err) {
+                res.json({
+                    "status": "ok",
+                    "message": err.sqlMessage
+                });
+            }
+            var resultCort = results.slice((page - 1) * resultPerPage, page * resultPerPage);
+            res.json(resultCort);
+        });
+    }
+});
+
+//Pregunta 6
+app.post("/categorias/create",bodyParser.urlencoded({extended:true}),function (req,res) {
+    var name = req.body.name;
+    var description = req.body.description;
+    var picture = req.body.picture;
+    if(name == null||description == null||picture == null){
+        res.json({
+            "status":"error",
+            "message":"Missing parameters"
+        });
+    }
+    else if(!(picture.endsWith(".jpg")||picture.endsWith(".png"))){
+        res.json({
+            "status":"error",
+            "message":"Picture doesn't have correct extension"
+        });
+    }
+    else {
+        var sql = "INSERT INTO `lab10_employees`.`categories` (`CategoryName`, `Description`, `Picture`) VALUES (?, ?, ?)";
+        var params = [name, description, picture];
+        conn.query(sql, params, function (err, results) {
+            if (err) {
+                res.json({
+                    "status": "error",
+                    "message": err.sqlMessage
+                });
+            }
             res.json({
-                "status":"error",
-                "message":"Numero de página no existe"
+                "status": "ok",
+                "message": "Category created"
             });
-        }
-        if(err){
-            res.json({
-                "status":"ok",
-                "message":err.sqlMessage
-            });
-        }
-        var resultCort=results.slice((page-1)*resultPerPage,page*resultPerPage);
-        res.json(resultCort);
-    });
+        });
+    }
 });
 
 //Puerto
